@@ -61,3 +61,27 @@ let aw = memoizeAckerman();
 console.log(aw(1, 2));
 
 console.log(aw(1,2));
+
+/*Реализовать генератор псевдослучайных чисел */
+
+const genPseudoRandomNumber = (startPoint, a, c, m, count) => {
+  let result = [];
+  let x = startPoint;
+  for (let i = 0; i < count; i++) {
+    x = (a * x + c) % m;
+    result.push(x);
+  }
+
+  return result;
+};
+
+
+let startPoint = 2;
+let a = 145;
+let c = 5678;
+let m = 11;
+
+let count = 5;
+let random = genPseudoRandomNumber(startPoint,a,c,m,count)
+
+console.log(random)
