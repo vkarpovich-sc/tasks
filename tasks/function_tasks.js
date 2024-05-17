@@ -123,3 +123,63 @@ res = deck.give(5);
 
 console.log(res);
 
+
+/*Рубли и копейки словами. Получить на ввод количество рублей и копеек и вывести в правильной форме в виде текста, 
+например, три рубля, одиннадцать рублей тридцать пять копеек, двадцать две копейки. */
+
+const rubels = prompt("введите количество рублей", 10);
+const coins = prompt("введите количество копееек", 10);
+
+const check = (cash) => {
+  cash = Number(cash);
+  return cash % 10;
+};
+
+const output = (rub, coins) => {
+  div = document.getElementById("container");
+  const rubRemain = check(rub);
+  const coinsRemain = check(coins);
+  switch (rubRemain) {
+    case 1:
+      console.log(rub);
+      div.innerHTML += `<h1>${rub} рубль</h1>`;
+      break;
+    case 2:
+    case 3:
+    case 4:
+      console.log(rub);
+      div.innerHTML += `<h1>${rub} рубля</h1>`;
+      break;
+    case 0:
+    case 5:
+    case 6:
+    case 7:
+    case 8:
+    case 9:
+      console.log(rub);
+      div.innerHTML += `<h1>${rub} рублей</h1>`;
+      break;
+  }
+
+  switch (coinsRemain) {
+    case 1:
+      div.innerHTML += `<h1>${coins} копейка</h1>`;
+      break;
+    case 2:
+    case 3:
+    case 4:
+      div.innerHTML += `<h1>${coins} копейки</h1>`;
+      break;
+    case 0:
+    case 5:
+    case 6:
+    case 7:
+    case 8:
+    case 9:
+      div.innerHTML += `<h1>${coins} копеек</h1>`;
+      break;
+  }
+};
+
+output(rubels, coins);
+
