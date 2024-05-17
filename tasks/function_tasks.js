@@ -85,3 +85,41 @@ let count = 5;
 let random = genPseudoRandomNumber(startPoint,a,c,m,count)
 
 console.log(random)
+
+/*Реализовать с помощью замыкания колоду карт, которая будет выдавать необходимое количество карт по запросу, можно без рандома.*/
+
+const createDeck = () => {
+  const suits = ["пики", "черви", "бубны", "крести"];
+  const ranks = ["6", "7", "8", "9", "10", "J", "D", "K", "A"];
+
+  let deck = [];
+
+  for (let i = 0; i < suits.length; i++) {
+    for (let j = 0; j < ranks.length; j++) {
+      deck.push(suits[i] + " " + ranks[j]);
+    }
+  }
+
+  const giveCards = (count) => {
+    let cards = [];
+    if (count > deck.length) console.log("не хватает карт в колоде");
+
+    for (let k = 0; k < count; k++) {
+      let randomCard = Math.floor(Math.random() * deck.length);
+      cards.push(deck.splice(randomCard, 1));
+    }
+    return cards;
+  };
+  return { give: giveCards };
+};
+
+const deck = createDeck();
+
+let res = deck.give(34);
+
+console.log(res);
+
+res = deck.give(5);
+
+console.log(res);
+
