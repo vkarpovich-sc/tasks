@@ -46,7 +46,6 @@ class Floor {
 class Elevator {
   constructor(elStartPoint, capacity) {
     this.elStartPoint = elStartPoint;
-    this.elEndPoint = elEndPoint;
     this.capacity = capacity;
   }
 
