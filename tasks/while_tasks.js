@@ -12,24 +12,20 @@
 Теперь все не зачеркнутые числа в списке — это все простые числа
  от 2 до n. */
 
-const n = 50;
-let numb = [];
-for (let i = 2; i < n + 1; i++) {
-  numb[i - 2] = i;
-}
-alert(numb);
-let s = 10;
-let p = 2;
-while (s) {
-  while (numb.length <= n + 1) {
-    let i = 2;
-    numb[i * p] = "/";
-    i++;
-  }
-  let newP = numb.find((a) => a > p);
-  p = newP;
-  console.log(numb);
-  console.log(newP);
-  s--;
-}
-alert(numb);
+ const n = 50;
+ let numb = [];
+ for (let i = 2; i < n + 1; i++) {
+   numb[i - 2] = i;
+ }
+ console.log(numb);
+ 
+ let p = 2;
+ while (p * p <= n) {
+   for (let i = p * p; i <= n; i += p) {
+     numb[i - 2] = null;
+   }
+   p++;
+ }
+ 
+ const primes = numb.filter((num) => num !== null);
+ console.log(primes);
