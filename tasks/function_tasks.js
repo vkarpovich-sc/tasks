@@ -183,3 +183,107 @@ const output = (rub, coins) => {
 
 output(rubels, coins);
 
+/*Крестики-Нолики. Реализовать игру Крестики-Нолики (консольный вариант) */
+
+const readline = require("readline");
+const rl = readline.createInterface({
+  input: process.stdin,
+  output: process.stdout,
+});
+const prompt = (query) => new Promise((resolve) => rl.question(query, resolve));
+const players = ["PlayerX", "PlayerY"];
+
+const checkIfWin = (field, symbol) => {
+  for (let i = 0; i < 3; i++) {
+    if (
+      field[i][0] === symbol &&
+      field[i][1] === symbol &&
+      field[i][2] === symbol
+    ) {
+      console.log("You Win");
+      rl.close();
+      return;
+    }
+  }
+
+  for (let j = 0; j < 3; j++) {
+    if (
+      field[0][j] === symbol &&
+      field[1][j] === symbol &&
+      field[2][j] === symbol
+    ) {
+      console.log("You Win");
+      rl.close();
+      return;
+    }
+  }
+
+  if (
+    (field[0][0] === symbol &&
+      field[1][1] === symbol &&
+      field[2][2] === symbol) ||
+    (field[0][2] === symbol && field[1][1] === symbol && field[2][0] === symbol)
+  ) {
+    console.log("You Win");
+    rl.close();
+    return;
+  }
+};
+
+const question = async (field, player) => {
+  try {
+    let symbol = "";
+    let player = "";
+    for (let y = 0; y < 9; y++) {
+      const posX = await prompt(
+        "What do you want to cross? (choose X - direction): "
+      );
+
+      const posY = await prompt(
+        "What do you want to cross? (choose Y - direction): "
+      );
+      if (player == "PlayerX") {
+        symbol = "X";
+        field[posX][posY] = `${symbol}`;
+        checkIfWin(field, symbol);
+        player = players[1];
+      } else {
+        symbol = "O";
+        field[posX][posY] = `${symbol}`;
+        checkIfWin(field, symbol);
+        player = players[0];
+      }
+
+      console.log("Free to use:", field);
+      console.log(`Ur turn ${player}`);
+    }
+  } catch (e) {
+    console.error("Unable to prompt", e);
+  }
+
+  return field;
+};
+
+const crossZero = async () => {
+  try {
+    let field = {};
+    for (let i = 0; i < 3; i++) {
+      field[i] = [];
+      for (let j = 0; j < 3; j++) {
+        field[i][j] = "_";
+      }
+    }
+
+    console.log("Free to use:", field);
+    console.log(`start ${players[1]}`);
+    field = await question(field, players[0]);
+  } catch (e) {
+    console.error("Unable to prompt", e);
+  }
+};
+
+crossZero();
+
+
+
+
