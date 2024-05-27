@@ -22,7 +22,7 @@
  let p = 2;
  while (p * p <= n) {
    for (let i = p * p; i <= n; i += p) {
-     numb[i - 2] = null;
+     numb[i - 2] = 'X';
    }
    p++;
  }
