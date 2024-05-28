@@ -33,6 +33,7 @@ class Elevator {
 
   loadPeople(floor) {
     const remainingCapacity = this.capacity - this.people.length;
+
     const passengers = floor.people.splice(0, remainingCapacity);
     this.people = this.people.concat(passengers);
   }
@@ -76,6 +77,17 @@ class Elevator {
           });
         }
       }
+      else {
+        const unloadedPeople = this.unloadPeople();
+        console.log(
+          `Высажены ${unloadedPeople.length} человек на этаже ${this.currentFloor}`
+        );
+        unloadedPeople.forEach((person) => {
+          console.log(
+            `- Человек с этажа ${person.startPoint} на этаж ${person.endPoint}`
+          );
+        });
+      }
 
       this.goToNextFloor();
     }
@@ -85,10 +97,15 @@ class Elevator {
 class Building {
   constructor() {
     this.floors = [];
-
+    this.amount = 0;
     for (let i = 0; i < 9; i++) {
-      const peopleAmount = Math.floor(Math.random() * 101);
+      const peopleAmount = Math.floor(Math.random() * (101 - this.amount));
+      this.amount += peopleAmount;
       this.floors.push(new Floor(i, peopleAmount));
+      console.log(
+        this.floors[i].floorNumber,
+        `населяет ${peopleAmount} челвоек`
+      );
     }
   }
 
