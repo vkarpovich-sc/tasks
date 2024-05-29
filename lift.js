@@ -33,7 +33,7 @@ class Elevator {
 
   loadPeople(floor) {
     const remainingCapacity = this.capacity - this.people.length;
-
+    console.log(`capacity ${remainingCapacity}`)
     const passengers = floor.people.splice(0, remainingCapacity);
     this.people = this.people.concat(passengers);
   }
@@ -45,13 +45,30 @@ class Elevator {
     this.people = this.people.filter(
       (person) => person.endPoint !== this.currentFloor
     );
+
     return unloadedPeople;
   }
 
-  goToNextFloor() {
-    this.currentFloor = (this.currentFloor + 1) % 9;
+  goToNextFloor(building) {
+    const floorsWPeople = building.floors
+      .filter((floor) => floor.hasPeople())
+      .map((el) => el.floorNumber);
+    const floors = this.people.map((el) => el.endPoint);
+    const allFloors = [...floors, ...floorsWPeople];
+    const sortedFloors = allFloors.sort(
+      (a, b) =>
+        Math.abs(a - this.currentFloor) - Math.abs(b - this.currentFloor)
+    );
+    for (let i = 0; i < sortedFloors.length; i++) {
+      const nextFloor = sortedFloors[i];
+      
+      if (nextFloor !== this.currentFloor) {
+        console.log({nextFloor})
+        this.currentFloor = nextFloor;
+        break;
+      } else this.currentFloor = (this.currentFloor + 1) % 9;
+    }
   }
-
   isFinished(building) {
     return (
       building.floors.every((floor) => !floor.hasPeople()) &&
@@ -76,8 +93,7 @@ class Elevator {
             );
           });
         }
-      }
-      else {
+      } else {
         const unloadedPeople = this.unloadPeople();
         console.log(
           `Высажены ${unloadedPeople.length} человек на этаже ${this.currentFloor}`
@@ -89,7 +105,7 @@ class Elevator {
         });
       }
 
-      this.goToNextFloor();
+      this.goToNextFloor(building);
     }
   }
 }
