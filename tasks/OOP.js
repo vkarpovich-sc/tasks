@@ -166,6 +166,7 @@ class HourPaymentWorker extends Worker {
   constructor(name, salaryPerHour) {
     super(name);
     this.salaryPerHour = salaryPerHour;
+    this.id = Date.now()+ 2
   }
 
   getSalary() {
@@ -180,6 +181,7 @@ class AverageMonthSalaryWorker extends Worker {
   constructor(name, salary) {
     super(name);
     this.salary = salary;
+    this.id = Date.now() + 1;
   }
 
   getSalary() {
