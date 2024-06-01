@@ -152,13 +152,17 @@ class Worker {
 
   static getFirstFiveNames(arr) {
     const sortedWorkers = arr.sort(Worker.averagePayment);
-    const firstFiveNames = sortedWorkers.slice(0, 5).map(worker => worker.name);
+    const firstFiveNames = sortedWorkers
+      .slice(0, 5)
+      .map((worker) => worker.name);
     return firstFiveNames;
   }
-  static getLastThreeIds (arr) {
-    const sortedWorkers = arr.sort(Worker.averagePayment)
-    const lastThreeId = sortedWorkers.slice(sortedWorkers.length-3,sortedWorkers.length).map(worker => worker.id)
-    return lastThreeId
+  static getLastThreeIds(arr) {
+    const sortedWorkers = arr.sort(Worker.averagePayment);
+    const lastThreeId = sortedWorkers
+      .slice(sortedWorkers.length - 3, sortedWorkers.length)
+      .map((worker) => worker.id);
+    return lastThreeId;
   }
 }
 
@@ -166,7 +170,6 @@ class HourPaymentWorker extends Worker {
   constructor(name, salaryPerHour) {
     super(name);
     this.salaryPerHour = salaryPerHour;
-    this.id = Date.now()+ 2
   }
 
   getSalary() {
@@ -181,7 +184,6 @@ class AverageMonthSalaryWorker extends Worker {
   constructor(name, salary) {
     super(name);
     this.salary = salary;
-    this.id = Date.now() + 1;
   }
 
   getSalary() {
@@ -196,11 +198,82 @@ let workers = [
   new AverageMonthSalaryWorker(`Vitaliy`, 500),
   new AverageMonthSalaryWorker(`Kosnatin`, 900),
   new HourPaymentWorker(`Alexand`, 60),
-  new Worker(`Viacheslav`)
+  new Worker(`Viacheslav`),
 ];
-let d = workers.sort(Worker.averagePayment)
-let b = Worker.getFirstFiveNames(workers)
-let c = Worker.getLastThreeIds(workers)
-console.log(d)
-console.log(b)
-console.log(c)
+let d = workers.sort(Worker.averagePayment);
+let b = Worker.getFirstFiveNames(workers);
+let c = Worker.getLastThreeIds(workers);
+console.log(a);
+console.log(b);
+console.log(c);
+// Класс-контейнер для водоплавающих
+// Реализовать класс-контейнер для водоплавающих: лодка, гусь, утка, катер,
+//спасательный
+//жилет. Набор доступных операций определяется интерфейсами объектов,
+// помещаемых в контейнер.
+// Дополнительный элемент контейнера – топор.
+
+class Container {
+  constructor() {
+    this.classes = [];
+    this.axe = `Топор`;
+  }
+
+  addClass(obj) {
+    this.classes.push(obj);
+  }
+  do() {
+    this.classes.forEach((obj) => obj.do());
+  }
+
+  useAxe() {
+    console.log(`${this.axe}  замахнулся и рубанул`);
+  }
+}
+
+class Goose {
+  do() {
+    console.log(`Goose is flying`);
+  }
+}
+
+class Duck {
+  do() {
+    console.log(`Duck is ducking`);
+  }
+}
+
+class Boat {
+  do() {
+    console.log(`Boat is boating`);
+  }
+}
+
+class SafeJacket {
+  do() {
+    console.log(`safejacket is saving`);
+  }
+}
+
+class MotorBoat {
+  do() {
+    console.log(`motorboar is motorboating`);
+  }
+}
+
+const container = new Container();
+
+const boat = new Boat();
+const goose = new Goose();
+const duck = new Duck();
+const motorBoat = new MotorBoat();
+const safeJacket = new SafeJacket();
+
+container.addClass(boat);
+container.addClass(goose);
+container.addClass(duck);
+container.addClass(motorBoat);
+container.addClass(safeJacket);
+
+container.do();
+container.useAxe();
