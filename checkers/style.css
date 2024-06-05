@@ -1,0 +1,21 @@
+#container {
+    width: 80%;
+    height: 80%;
+}
+
+th {
+    border: 1px solid rgb(32, 159, 209);
+    width:5%;
+    padding: 50px 50px;
+}
+
+[id^="pos-0"]:nth-child(even),
+[id^="pos-2"]:nth-child(even),
+[id^="pos-4"]:nth-child(even),
+[id^="pos-6"]:nth-child(even),
+[id^="pos-1"]:nth-child(odd), 
+[id^="pos-3"]:nth-child(odd),
+[id^="pos-5"]:nth-child(odd),
+[id^="pos-7"]:nth-child(odd){
+    background-color: rgb(23, 126, 211);
+}
