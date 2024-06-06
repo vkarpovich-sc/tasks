@@ -1,39 +1,77 @@
 const div = document.getElementById("container");
+const table = document.getElementsByTagName("table")[0];
+const letters = [`A`, `B`, `C`, `D`, `E`, `F`, `G`, `H`];
+class Checker {
+  constructor(pos, color, isBot) {
+    this.pos = pos;
+    this.color = color;
+    this.isBot = isBot
+  }
+
+  click () {
+    alert(`ты нажала на меня`)
+    stopPreparation()
+  }
+
+  createCheck() {
+    let check;
+    if (this.isBot) {
+      check = document.createElement(`div`);
+      check.style.cssText = `background-color: white;
+      border: 2px solid gray;
+      border-radius: 50px;
+      width: 40px;
+      height:40px;
+      position: absolute;
+      top: 50%;
+      left: 50%;
+      transform: translate(-50%, -50%);`;
+      check.addEventListener("click", () => {
+        alert(`spasibo`)
+      })
+    }
+    else {
+      check = document.createElement(`div`);
+      check.style.cssText = `background-color: black;
+      border: 2px solid gray;
+      border-radius: 50px;
+      width: 40px;
+      height:40px;
+      position: absolute;
+      top: 50%;
+      left: 50%;
+      transform: translate(-50%, -50%);`;
+      check.addEventListener("click", (e) => {
+        alert( this.pos)
+      })
+    }
+
+    return check;
+  }
+}
 (function () {
-  let field = [];
+  let checks = []
   for (let i = 0; i < 8; i++) {
-    field[i] = [];
     let tr = document.createElement("tr");
+    checks[i] = []
     for (let j = 0; j < 8; j++) {
-      field[i][j] = `pos`;
+       checks[i][j] = new Checker(`${letters[j]}-${i + 1}`, `white`, false);
+
       let th = document.createElement("th");
-     // th.textContent = "A";
-      // th.style.cssText = `background-color: brown`
-      th.setAttribute("id", `pos-${i}-${j}`);
-       if (i == 3 || i == 4) {
+
+      th.setAttribute("id", `pos-${i + 1}-${letters[j]}`);
+     // th.addEventListener("click" ,checks[i][j].click() )
+      if (i == 3 || i == 4) {
         tr.appendChild(th);
-        continue
-       }
-      if (i % 2 && j %  2) {
-        let circle = document.createElement(`div`)
-        circle.style.cssText = `background-color: black;
-        border: 10px solid gray;
-        border-radius: 50px;
-        width: 35px;
-        height: 35px;`
-        th.append(circle)
-      } else if (!(i % 2) && !(j %  2)) {
-        let circle = document.createElement(`div`)
-        circle.style.cssText = `background-color: black;
-        border: 1px solid black;
-        border-radius: 50px;
-        width: 35px;
-        height: 35px;`
-        th.append(circle)
+        continue;
+      } else if ((i + 1) % 2 && j % 2) {
+        th.append(checks[i][j].createCheck());
+      } else if (!((i + 1) % 2) && !(j % 2)) {
+        th.append(checks[i][j].createCheck());
       }
 
       tr.appendChild(th);
     }
-    div.appendChild(tr);
+    table.appendChild(tr);
   }
 })();
