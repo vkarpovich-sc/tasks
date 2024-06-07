@@ -5,7 +5,7 @@ class Checker {
   constructor(posLetter, posNumber, color, isBot) {
     this.posLetter = posLetter;
     this.posNumber = posNumber;
-    this.pos = `${this.posLetter}-${this.posNumber}`;
+    this.pos = `${this.posNumber}-${this.posLetter}`;
     this.color = color;
     this.isBot = isBot;
   }
@@ -34,7 +34,7 @@ class Checker {
       case rightLetter == null:
         let th1 = document.getElementById(`pos-${number}-${leftLetter}`);
         if (th1.hasChildNodes()) {
-          return 
+          return;
         } else {
           th1.style.backgroundColor = `rgb(247, 220, 111 )`;
         }
@@ -42,7 +42,7 @@ class Checker {
       case leftLetter == null:
         let th2 = document.getElementById(`pos-${number}-${leftLetter}`);
         if (th2.hasChildNodes()) {
-          return
+          return;
         } else {
           th2.style.backgroundColor = `rgb(247, 220, 111 )`;
         }
@@ -50,12 +50,46 @@ class Checker {
       default:
         let leftTh = document.getElementById(`pos-${number}-${leftLetter}`);
         let rightTh = document.getElementById(`pos-${number}-${rightLetter}`);
+        rightTh.addEventListener("click", () => {
+          let check = document.getElementById(`pos-${this.pos}`);
+          check.innerHTML = ``;
+          let k = document.createElement(`div`);
+          k.style.cssText = `background-color: ${this.color};
+          border: 2px solid gray;
+          border-radius: 50px;
+          width: 40px;
+          height:40px;
+          position: absolute;
+          top: 50%;
+          left: 50%;
+          transform: translate(-50%, -50%);`;
+          rightTh.append(k);
+          rightTh.style.backgroundColor = `rgb(23, 126, 211)`;
+          leftTh.style.backgroundColor = `rgb(23, 126, 211)`;
+        });
+        leftTh.addEventListener("click", () => {
+          let check = document.getElementById(`pos-${this.pos}`);
+          check.innerHTML = ``;
+          let k = document.createElement(`div`);
+          k.style.cssText = `background-color: ${this.color};
+          border: 2px solid gray;
+          border-radius: 50px;
+          width: 40px;
+          height:40px;
+          position: absolute;
+          top: 50%;
+          left: 50%;
+          transform: translate(-50%, -50%);`;
+          leftTh.append(k);
+          leftTh.style.backgroundColor = `rgb(23, 126, 211)`;
+          rightTh.style.backgroundColor = `rgb(23, 126, 211)`
+        });
         if (
           leftTh.hasChildNodes() ||
           rightTh.hasChildNodes() ||
           (leftTh.hasChildNodes() && rightTh.hasChildNodes())
         ) {
-          return
+          return;
         } else {
           leftTh.style.backgroundColor = `rgb(247, 220, 111 )`;
           rightTh.style.backgroundColor = `rgb(247, 220, 111 )`;
