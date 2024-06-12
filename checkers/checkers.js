@@ -100,9 +100,9 @@ class Human extends Player {
     this.check = [];
   }
   checkNearest(field, n1, n2) {
-    console.log(field[n1][n2])
-    console.log(field[n1 - 1][n2 + 1])
-      if (field[n1 - 1][n2 + 1]!=`div` && field[n1 - 1][ n2 -1] != `div`) {
+    console.log(typeof field[n1][n2])
+    console.log( typeof field[n1 - 1][n2 + 1])
+      if (field[n1 - 1][n2 + 1].localName != `div` && field[n1 - 1][ n2 -1].localName != `div`) {
         let rowEl1 = document.getElementById(`${field[n1 - 1][n2 + 1].id}`)
         let rowEl2 = document.getElementById(`${field[n1 - 1][n2 - 1].id}`)
         rowEl1.style.backgroundColor = `yellow`
