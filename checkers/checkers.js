@@ -98,37 +98,63 @@ class Human extends Player {
   constructor() {
     super();
     this.check = [];
+    this.clickedFigure = null;
   }
   checkNearest(field, n1, n2) {
-    console.log(typeof field[n1][n2])
-    console.log( typeof field[n1 - 1][n2 + 1])
-      if (field[n1 - 1][n2 + 1].localName != `div` && field[n1 - 1][ n2 -1].localName != `div`) {
-        let rowEl1 = document.getElementById(`${field[n1 - 1][n2 + 1].id}`)
-        let rowEl2 = document.getElementById(`${field[n1 - 1][n2 - 1].id}`)
-        rowEl1.style.backgroundColor = `yellow`
-        rowEl2.style.backgroundColor = `yellow`
-      }
+    const cell = new Cell();
+    switch (true) {
+      case field[n1 - 1][n2 - 1] == undefined &&
+        field[n1 - 1][n2 + 1].localName != `div`:
+        cell.highlightMoves(`${field[n1 - 1][n2 + 1].id}`);
+        break;
+      case field[n1 - 1][n2 + 1] == undefined &&
+        field[n1 - 1][n2 - 1].localName != `div`:
+        cell.highlightMoves(`${field[n1 - 1][n2 - 1].id}`);
+
+        break;
+      case field[n1 - 1][n2 + 1] == undefined ||
+        field[n1 - 1][n2 - 1] == undefined:
+        alert(`ходить нельзя`);
+        break;
+
+      case field[n1 - 1][n2 + 1].localName != `div` &&
+        field[n1 - 1][n2 - 1].localName != `div`:
+        cell.highlightMoves(
+          `${field[n1 - 1][n2 + 1].id}`,
+          `${field[n1 - 1][n2 - 1].id}`
+        );
+        break;
+
+      case field[n1 - 1][n2 + 1].localName != `div` &&
+        field[n1 - 1][n2 - 1].localName == `div`:
+        cell.highlightMoves(`${field[n1 - 1][n2 + 1].id}`);
+        break;
+      case field[n1 - 1][n2 + 1].localName == `div` &&
+        field[n1 - 1][n2 - 1].localName != `div`:
+        cell.highlightMoves(`${field[n1 - 1][n2 - 1].id}`);
+        break;
+    }
   }
   checkMove(field, target) {
     const id = target.id;
 
-
-    let check = null
     field.forEach((innerArray) => {
       innerArray.forEach((el) => {
-        if (el.id == id){
-          check = el
-        // alert(`${field[field.indexOf(innerArray)][innerArray.indexOf(el)].id} + ${innerArray.indexOf(el)}`)
-          this.checkNearest(field,field.indexOf(innerArray),  innerArray.indexOf(el))
+        if (el.id == id) {
+          this.clickedFigure = el.id;
+          this.checkNearest(
+            field,
+            field.indexOf(innerArray),
+            innerArray.indexOf(el)
+          );
         }
       });
     });
   }
+
+  handleMove(field, id) {}
   generateCheck(posL, posN) {
     const check = new Simple(posL, posN, `white`).generateCheck();
-    // check.addEventListener(`click`, () => {
-    //   alert(`${posL} + ${posN}`);
-    // });
     this.check.push(check);
     return check;
   }
@@ -150,6 +176,7 @@ class Bot extends Player {
 }
 
 class Cell {
+  static previousCells = [];
   constructor(color, id) {
     this.color = color;
     this.id = id;
@@ -166,10 +193,19 @@ class Cell {
     return cell;
   }
 
-  changeColor(cell, cellColor) {
-    cellColor == `yellow`
-      ? (cell.style.backgroundColor = `blue`)
-      : cell.style.backgroundColor == `yellow`;
+  highlightMoves(...ids) {
+    const cell = [];
+
+    for (let i = 0; i < Cell.previousCells.length; i++) {
+      Cell.previousCells[i].style.backgroundColor = `blue`;
+    }
+    for (let i = 0; i < ids.length; i++) {
+      cell[i] = document.getElementById(ids[i]);
+      if (!Cell.previousCells.includes(cell[i])) {
+        Cell.previousCells.push(cell[i]);
+      }
+      cell[i].style.backgroundColor = `yellow`;
+    }
   }
 }
 
@@ -179,7 +215,16 @@ class Rules {
 
 class Game {
   constructor() {}
-
+  generateHistoryField(move) {
+    const div = document.getElementById(`container`);
+    div.style.cssText = `display: grid;
+     gap: 20px;
+     grid-template-columns: 100% 10%;`;
+    const innerDiv = document.getElementById(`innerDiv`);
+    const p = document.createElement(`p`);
+    p.innerHTML = move;
+    innerDiv.append(p);
+  }
   startGame() {
     const field = new Field();
     const human = new Human();
@@ -188,6 +233,15 @@ class Game {
     document.addEventListener("click", (event) => {
       if (event.target.localName === `div`) {
         human.checkMove(field.field, event.target);
+        this.generateHistoryField(event.target.id);
+      } else if (event.target.style.backgroundColor == `yellow`) {
+        this.generateHistoryField(event.target.id);
+        let a = document.getElementsByTagName(`div`);
+
+        a = Array.from(a);
+        console.log(a);
+        a = a.find((el) => el.id == human.clickedFigure);
+        //field.field.find(a).then((el) => el.id = event.targ
       }
     });
     console.log(field.field);
