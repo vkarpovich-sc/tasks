@@ -74,10 +74,10 @@ class Field {
         }
         if (i + 1 == 6 || i + 1 == 7 || i + 1 == 8) {
           checks[i][j] = Human.generateCheck(letters[j], i + 1);
-          this.field[i][j] = `pos-${letters[j]}-${i + 1}`;
+          this.field[i][j] = cell;
         } else {
           checks[i][j] = Bot.generateCheck(letters[j], i + 1);
-          this.field[i][j] = `pos-${letters[j]}-${i + 1}`;
+          this.field[i][j] = cell;
         }
         if (cellColor == `black`) {
           cell.append(checks[i][j]);
@@ -110,9 +110,8 @@ class Human extends Player {
       case field[n1 - 1][n2 + 1] == undefined &&
         field[n1 - 1][n2 - 1].localName != `div`:
         cell.highlightMoves(`${field[n1 - 1][n2 - 1].id}`);
-
         break;
-      case field[n1 - 1][n2 + 1] == undefined ||
+      case field[n1 - 1][n2 + 1] == undefined &&
         field[n1 - 1][n2 - 1] == undefined:
         alert(`ходить нельзя`);
         break;
@@ -152,7 +151,28 @@ class Human extends Player {
     });
   }
 
-  handleMove(field, id) {}
+  handleMove(element, field, event) {
+    field.forEach((innerArray) => {
+      innerArray.forEach((el) => {
+        if (el.id == event.target.id) {
+          field[field.indexOf(innerArray)][innerArray.indexOf(el)] = element;
+          console.log(`element - ${element}`)
+          console.log(`f - ${ field[field.indexOf(innerArray)][innerArray.indexOf(el)]}`)
+        }
+
+        if (el == element) {
+          const cell = new Cell(`white`, el.id)
+          field[field.indexOf(innerArray)][innerArray.indexOf(el)] = cell.generateCell()
+          console.log(`el.id = ${el.id}`)
+
+          element.id = event.target.id;
+          event.target.append(element);
+          cell.highlightMoves()
+        }
+      });
+    });
+    return field;
+  }
   generateCheck(posL, posN) {
     const check = new Simple(posL, posN, `white`).generateCheck();
     this.check.push(check);
@@ -197,7 +217,7 @@ class Cell {
     const cell = [];
 
     for (let i = 0; i < Cell.previousCells.length; i++) {
-      Cell.previousCells[i].style.backgroundColor = `blue`;
+      Cell.previousCells[i].style.backgroundColor = `rgb(23, 126, 211)`;
     }
     for (let i = 0; i < ids.length; i++) {
       cell[i] = document.getElementById(ids[i]);
@@ -233,18 +253,17 @@ class Game {
     document.addEventListener("click", (event) => {
       if (event.target.localName === `div`) {
         human.checkMove(field.field, event.target);
-        this.generateHistoryField(event.target.id);
       } else if (event.target.style.backgroundColor == `yellow`) {
         this.generateHistoryField(event.target.id);
         let a = document.getElementsByTagName(`div`);
 
         a = Array.from(a);
-        console.log(a);
+
         a = a.find((el) => el.id == human.clickedFigure);
-        //field.field.find(a).then((el) => el.id = event.targ
+        field.field = human.handleMove(a, field.field, event);
+        console.log(field.field)
       }
     });
-    console.log(field.field);
   }
 }
 
