@@ -100,6 +100,21 @@ class Human extends Player {
     this.check = [];
     this.clickedFigure = null;
   }
+  handleCheck(element, field) {
+    field.forEach((innerArray) => {
+      innerArray.forEach((el) => {
+        if (el.id == element) {
+          let th = document.getElementsByTagName(`th`);
+          th = Array.from(th);
+          let thWithChild = th.find((el) => {
+            el.id == element;
+          });
+          thWithChild.firstChild = null;
+          field[indexOf(innerArray)][indexOf(el)] = element;
+        }
+      });
+    });
+  }
   checkNearest(field, n1, n2) {
     const cell = new Cell();
     switch (true) {
@@ -132,6 +147,19 @@ class Human extends Player {
         field[n1 - 1][n2 - 1].localName != `div`:
         cell.highlightMoves(`${field[n1 - 1][n2 - 1].id}`);
         break;
+
+      case field[n1 - 1][n2 + 1].localName == `div` &&
+        field[n1 - 1][n2 + 1].style.backgroundColor == `black` &&
+        field[n1 - 2][n2 + 2].localName != `div`:
+        cell.highlightMoves(`${field[n1 - 2][n2 + 2].id}`);
+        // this.handleCheck( field[n1 - 1][n2 + 1].id, field)
+        break;
+      case field[n1 - 1][n2 - 1].localName == `div` &&
+        field[n1 - 1][n2 - 1].style.backgroundColor == `black` &&
+        field[n1 - 2][n2 - 2].localName != `div`:
+        cell.highlightMoves(`${field[n1 - 2][n2 - 2].id}`);
+        // this.handleCheck( field[n1 - 1][n2 - 1].id, field)
+        break;
     }
   }
   checkMove(field, target) {
@@ -156,18 +184,21 @@ class Human extends Player {
       innerArray.forEach((el) => {
         if (el.id == event.target.id) {
           field[field.indexOf(innerArray)][innerArray.indexOf(el)] = element;
-          console.log(`element - ${element}`)
-          console.log(`f - ${ field[field.indexOf(innerArray)][innerArray.indexOf(el)]}`)
+          console.log(`element - ${element}`);
+          console.log(
+            `f - ${field[field.indexOf(innerArray)][innerArray.indexOf(el)]}`
+          );
         }
 
         if (el == element) {
-          const cell = new Cell(`white`, el.id)
-          field[field.indexOf(innerArray)][innerArray.indexOf(el)] = cell.generateCell()
-          console.log(`el.id = ${el.id}`)
+          const cell = new Cell(`white`, el.id);
+          field[field.indexOf(innerArray)][innerArray.indexOf(el)] =
+            cell.generateCell();
+          console.log(`el.id = ${el.id}`);
 
           element.id = event.target.id;
           event.target.append(element);
-          cell.highlightMoves()
+          cell.highlightMoves();
         }
       });
     });
@@ -184,12 +215,46 @@ class Bot extends Player {
   constructor() {
     super();
     this.check = [];
+    // this.clickedFigure = null;
   }
+
+  handleMove(field) {
+    const random = Math.floor(Math.random() * 12);
+
+    const check = this.check[random];
+
+    field.forEach((innerArray) => {
+      innerArray.forEach((el) => {
+        if (el.id == check.id) {
+          const cell = new Cell(`black`, check.id);
+          field[field.indexOf(innerArray)][innerArray.indexOf(check)] =
+            cell.generateCell();
+        }
+      });
+      innerArray.forEach((pos) => {
+        const human = new Bot();
+        if (
+          pos.localName != `div` &&
+          pos.style.backgroundColor == `rgb(23, 126, 211)`
+        ) {
+          check.id = pos.id;
+          const string = check.id;
+          let g = string.split(`-`);
+
+          field[field.indexOf(innerArray)][innerArray.indexOf(pos)] =
+            human.generateCheck(g[2], g[1]);
+          pos.append(human.generateCheck(g[2], g[1]));
+        }
+      });
+    });
+    return field;
+  }
+
   generateCheck(posL, posN) {
     const check = new Simple(posL, posN, `black`).generateCheck();
-    check.addEventListener(`click`, () => {
+    /*check.addEventListener(`click`, () => {
       alert(`${posL} + ${posN} + BOT`);
-    });
+    });*/
     this.check.push(check);
     return check;
   }
@@ -250,19 +315,28 @@ class Game {
     const human = new Human();
     const bot = new Bot();
     field.generateField(human, bot);
+
     document.addEventListener("click", (event) => {
-      if (event.target.localName === `div`) {
+      if (
+        event.target.localName === `div` &&
+        event.target.style.backgroundColor == `white`
+      ) {
         human.checkMove(field.field, event.target);
       } else if (event.target.style.backgroundColor == `yellow`) {
         this.generateHistoryField(event.target.id);
+
         let a = document.getElementsByTagName(`div`);
 
         a = Array.from(a);
 
         a = a.find((el) => el.id == human.clickedFigure);
+
         field.field = human.handleMove(a, field.field, event);
-        console.log(field.field)
+       
+
+        console.log(field.field);
       }
+      field.field = bot.handleMove(field.field);
     });
   }
 }
