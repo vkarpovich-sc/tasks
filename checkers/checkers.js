@@ -1,5 +1,4 @@
 class Checker {
-  // класс шашка. создает саму шашку, задает ее цвет и обозначает методы движения
   constructor(posLetter, posNumber, color) {
     this.posLetter = posLetter;
     this.posNumber = posNumber;
@@ -11,7 +10,6 @@ class Checker {
 }
 
 class Simple extends Checker {
-  // класс простой шашки. здесь написано ее движение и цвет, а также принимает позицию.
   constructor(posLetter, posNumber, color) {
     super(posLetter, posNumber, color);
     this.pos = `pos-${this.posNumber}-${this.posLetter}`;
@@ -19,7 +17,7 @@ class Simple extends Checker {
 
   generateCheck() {
     const check = document.createElement(`div`);
-    //check.setAttribute(`id`, this.pos)
+
     check.setAttribute(`id`, this.pos);
     check.style.cssText = `background-color: ${this.color};
     border: 2px solid gray;
@@ -30,27 +28,20 @@ class Simple extends Checker {
     top: 50%;
     left: 50%;
     transform: translate(-50%, -50%);`;
-    /*check.addEventListener(`click`, () => {
-      this.handleMove()
-    })*/
     return check;
   }
 }
 
 class Lady extends Checker {
-  // здесь написаны движение дамки
   constructor() {}
 }
 
 class Field {
-  // создание поля при помощи класса клетки
-
   constructor() {
     this.field = [];
   }
 
   generateField(Human, Bot) {
-    //const div = document.getElementById(`container`);
     const table = document.getElementsByTagName(`table`)[0];
     const letters = [`A`, `B`, `C`, `D`, `E`, `F`, `G`, `H`];
     let checks = [];
@@ -100,68 +91,90 @@ class Human extends Player {
     this.check = [];
     this.clickedFigure = null;
   }
-  handleCheck(element, field) {
-    field.forEach((innerArray) => {
-      innerArray.forEach((el) => {
-        if (el.id == element) {
-          let th = document.getElementsByTagName(`th`);
-          th = Array.from(th);
-          let thWithChild = th.find((el) => {
-            el.id == element;
-          });
-          thWithChild.firstChild = null;
-          field[indexOf(innerArray)][indexOf(el)] = element;
+
+  handleJump() {}
+
+  checkJump(field, n1, n2, cell, expression, cellClass) {
+    let i = 1;
+    const checking = (field, n1, n2, cell) => {
+      if (cell.style.backgroundColor === `black`) {
+        let emptyCell = null;
+        if (expression == 1) {
+          emptyCell =
+            field[n1 - i][n2 - i] == undefined ||
+            field[n1 - i][n2 - i].localName === "div";
+        } else {
+          emptyCell =
+            field[n1 - i][n2 + i] == undefined ||
+            field[n1 - i][n2 + i].localName === "div";
         }
-      });
-    });
+
+        if (emptyCell) {
+          i++;
+          checking(field, n1, n2, cell);
+        } else {
+          if (expression == 1) {
+            const FREEPOS = field[n1 - i][n2 - i];
+            alert(FREEPOS.id);
+            //checking(field, n1, n2, FREEPOS);
+            return FREEPOS;
+          } else {
+            const FREEPOS = field[n1 - i][n2 + i];
+            alert(FREEPOS.id);
+           // checking(field, n1, n2, FREEPOS);
+            return FREEPOS;
+          }
+        }
+      }
+    };
+    checking(field, n1, n2, cell);
   }
   checkNearest(field, n1, n2) {
     const cell = new Cell();
+    const cell1 = field[n1 - 1][n2 + 1];
+    const cell2 = field[n1 - 1][n2 - 1];
+    const cell1IsEmpty = cell1 == undefined || cell1.localName === "div";
+    const cell2IsEmpty = cell2 == undefined || cell2.localName === "div";
+
     switch (true) {
-      case field[n1 - 1][n2 - 1] == undefined &&
-        field[n1 - 1][n2 + 1].localName != `div`:
-        cell.highlightMoves(`${field[n1 - 1][n2 + 1].id}`);
+      case !cell1IsEmpty && !cell2IsEmpty:
+        cell.highlightMoves(cell1.id, cell2.id);
         break;
-      case field[n1 - 1][n2 + 1] == undefined &&
-        field[n1 - 1][n2 - 1].localName != `div`:
-        cell.highlightMoves(`${field[n1 - 1][n2 - 1].id}`);
-        break;
-      case field[n1 - 1][n2 + 1] == undefined &&
-        field[n1 - 1][n2 - 1] == undefined:
-        alert(`ходить нельзя`);
-        break;
+      case cell1IsEmpty && !cell2IsEmpty:
+        if (cell1 != undefined) {
+          const FREEPOS1 = this.checkJump(field, n1, n2, cell1, 1, cell);
+          const FREEPOS2 = this.checkJump(field, n1, n2, cell1, 2, cell);
+          if (FREEPOS1 && FREEPOS2) {
+            cell.highlightMoves(FREEPOS1.id, FREEPOS2.id, cell2.id);
+          } else if (FREEPOS1) {
+            cell.highlightMoves(FREEPOS1.id, cell2.id);
+          } else if (FREEPOS2) {
+            cell.highlightMoves(FREEPOS2.id, cell2.id);
+          }
+        } else {
+          cell.highlightMoves(cell2.id);
+        }
 
-      case field[n1 - 1][n2 + 1].localName != `div` &&
-        field[n1 - 1][n2 - 1].localName != `div`:
-        cell.highlightMoves(
-          `${field[n1 - 1][n2 + 1].id}`,
-          `${field[n1 - 1][n2 - 1].id}`
-        );
         break;
-
-      case field[n1 - 1][n2 + 1].localName != `div` &&
-        field[n1 - 1][n2 - 1].localName == `div`:
-        cell.highlightMoves(`${field[n1 - 1][n2 + 1].id}`);
-        break;
-      case field[n1 - 1][n2 + 1].localName == `div` &&
-        field[n1 - 1][n2 - 1].localName != `div`:
-        cell.highlightMoves(`${field[n1 - 1][n2 - 1].id}`);
-        break;
-
-      case field[n1 - 1][n2 + 1].localName == `div` &&
-        field[n1 - 1][n2 + 1].style.backgroundColor == `black` &&
-        field[n1 - 2][n2 + 2].localName != `div`:
-        cell.highlightMoves(`${field[n1 - 2][n2 + 2].id}`);
-        // this.handleCheck( field[n1 - 1][n2 + 1].id, field)
-        break;
-      case field[n1 - 1][n2 - 1].localName == `div` &&
-        field[n1 - 1][n2 - 1].style.backgroundColor == `black` &&
-        field[n1 - 2][n2 - 2].localName != `div`:
-        cell.highlightMoves(`${field[n1 - 2][n2 - 2].id}`);
-        // this.handleCheck( field[n1 - 1][n2 - 1].id, field)
+      case cell2IsEmpty && !cell1IsEmpty:
+        if (cell2 != undefined) {
+          const FREEPOS1 = this.checkJump(field, n1, n2, cell2, 1, cell);
+          const FREEPOS2 = this.checkJump(field, n1, n2, cell2, 2, cell);
+          if (FREEPOS1 && FREEPOS2) {
+            cell.highlightMoves(FREEPOS1.id, FREEPOS2.id, cell1.id);
+          } else if (FREEPOS1) {
+            cell.highlightMoves(FREEPOS1.id, cell1.id);
+          } else if (FREEPOS2) {
+            cell.highlightMoves(FREEPOS2.id, cell1.id);
+          }
+        } else {
+          cell.highlightMoves(cell1.id);
+        }
+        //
         break;
     }
   }
+
   checkMove(field, target) {
     const id = target.id;
 
@@ -184,10 +197,6 @@ class Human extends Player {
       innerArray.forEach((el) => {
         if (el.id == event.target.id) {
           field[field.indexOf(innerArray)][innerArray.indexOf(el)] = element;
-          console.log(`element - ${element}`);
-          console.log(
-            `f - ${field[field.indexOf(innerArray)][innerArray.indexOf(el)]}`
-          );
         }
 
         if (el == element) {
@@ -215,7 +224,6 @@ class Bot extends Player {
   constructor() {
     super();
     this.check = [];
-    // this.clickedFigure = null;
   }
 
   handleMove(field) {
@@ -252,9 +260,6 @@ class Bot extends Player {
 
   generateCheck(posL, posN) {
     const check = new Simple(posL, posN, `black`).generateCheck();
-    /*check.addEventListener(`click`, () => {
-      alert(`${posL} + ${posN} + BOT`);
-    });*/
     this.check.push(check);
     return check;
   }
@@ -332,7 +337,6 @@ class Game {
         a = a.find((el) => el.id == human.clickedFigure);
 
         field.field = human.handleMove(a, field.field, event);
-       
 
         console.log(field.field);
       }
