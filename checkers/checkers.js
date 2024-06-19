@@ -94,40 +94,72 @@ class Human extends Player {
 
   handleJump() {}
 
-  checkJump(field, n1, n2, cell, expression, cellClass) {
+  checkJump(field, n1, n2, cell, expression) {
     let i = 1;
-    const checking = (field, n1, n2, cell) => {
-      if (cell.style.backgroundColor === `black`) {
-        let emptyCell = null;
+    let lastFreeCell = null;
+
+    const checking = (field, n1, n2) => {
+      let isCellEmpty = null;
+      if (expression == 1) {
+        isCellEmpty =
+          field[n1 - i][n2 - i] == undefined ||
+          field[n1 - i][n2 - i].localName === "div";
+      } else {
+        isCellEmpty =
+          field[n1 - i][n2 + i] == undefined ||
+          field[n1 - i][n2 + i].localName === "div";
+      }
+
+      if (isCellEmpty && cell.style.backgroundColor != `white`) {
+        if (n1 - i < 0 || n2 - i < 0 || n2 + i >= field.length) {
+          return null;
+        }
+        i++;
         if (expression == 1) {
-          emptyCell =
-            field[n1 - i][n2 - i] == undefined ||
-            field[n1 - i][n2 - i].localName === "div";
+          lastFreeCell = field[n1 - i][n2 - i];
+          cell = lastFreeCell;
         } else {
-          emptyCell =
-            field[n1 - i][n2 + i] == undefined ||
-            field[n1 - i][n2 + i].localName === "div";
+          lastFreeCell = field[n1 - i][n2 + i];
+          cell = lastFreeCell;
         }
 
-        if (emptyCell) {
-          i++;
-          checking(field, n1, n2, cell);
+        if (
+          isCellEmpty &&
+          (lastFreeCell === undefined ||
+            lastFreeCell === null ||
+            lastFreeCell.localName != `th`)
+        ) {
+          return null;
         } else {
-          if (expression == 1) {
-            const FREEPOS = field[n1 - i][n2 - i];
-            alert(FREEPOS.id);
-            //checking(field, n1, n2, FREEPOS);
-            return FREEPOS;
-          } else {
-            const FREEPOS = field[n1 - i][n2 + i];
-            alert(FREEPOS.id);
-           // checking(field, n1, n2, FREEPOS);
-            return FREEPOS;
+          console.log(
+            `lastFreeCell - (id) - ${lastFreeCell.id} - (localName) - ${lastFreeCell.localName}`
+          );
+          if (lastFreeCell.localName != `th`) {
+            return null;
+          }
+          checking(field, n1, n2);
+        }
+      } else {
+        if (expression == 1) {
+          const FREEPOS = field[n1 - i][n2 - i];
+          if (FREEPOS.localName != `div`) {
+            lastFreeCell = FREEPOS;
+          }
+        } else {
+          const FREEPOS = field[n1 - i][n2 + i];
+          if (FREEPOS.localName != `div`) {
+            lastFreeCell = FREEPOS;
           }
         }
       }
     };
-    checking(field, n1, n2, cell);
+    if (cell.style.backgroundColor === "black" && cell.localName == `div`) {
+      console.log(`Cell - (id) - ${cell.id} - (localName) - ${cell.localName}`);
+
+      checking(field, n1, n2);
+    }
+    i = 1;
+    return lastFreeCell;
   }
   checkNearest(field, n1, n2) {
     const cell = new Cell();
@@ -135,43 +167,75 @@ class Human extends Player {
     const cell2 = field[n1 - 1][n2 - 1];
     const cell1IsEmpty = cell1 == undefined || cell1.localName === "div";
     const cell2IsEmpty = cell2 == undefined || cell2.localName === "div";
-
+    console.log(
+      `cell1IsEmpty - ${cell1IsEmpty} &&  !cell1IsEmpty - ${!cell1IsEmpty},cell2IsEmpty - ${cell2IsEmpty}  &&  !cell2IsEmpty - ${!cell2IsEmpty}`
+    );
     switch (true) {
-      case !cell1IsEmpty && !cell2IsEmpty:
-        cell.highlightMoves(cell1.id, cell2.id);
-        break;
-      case cell1IsEmpty && !cell2IsEmpty:
-        if (cell1 != undefined) {
-          const FREEPOS1 = this.checkJump(field, n1, n2, cell1, 1, cell);
-          const FREEPOS2 = this.checkJump(field, n1, n2, cell1, 2, cell);
-          if (FREEPOS1 && FREEPOS2) {
-            cell.highlightMoves(FREEPOS1.id, FREEPOS2.id, cell2.id);
-          } else if (FREEPOS1) {
-            cell.highlightMoves(FREEPOS1.id, cell2.id);
-          } else if (FREEPOS2) {
-            cell.highlightMoves(FREEPOS2.id, cell2.id);
-          }
-        } else {
-          cell.highlightMoves(cell2.id);
-        }
-
-        break;
       case cell2IsEmpty && !cell1IsEmpty:
         if (cell2 != undefined) {
-          const FREEPOS1 = this.checkJump(field, n1, n2, cell2, 1, cell);
-          const FREEPOS2 = this.checkJump(field, n1, n2, cell2, 2, cell);
-          if (FREEPOS1 && FREEPOS2) {
-            cell.highlightMoves(FREEPOS1.id, FREEPOS2.id, cell1.id);
-          } else if (FREEPOS1) {
-            cell.highlightMoves(FREEPOS1.id, cell1.id);
-          } else if (FREEPOS2) {
-            cell.highlightMoves(FREEPOS2.id, cell1.id);
+          const FREEPOS2 = this.checkJump(field, n1, n2, cell2, 2);
+          const FREEPOS1 = this.checkJump(field, n1, n2, cell2, 1);
+
+          if (FREEPOS1 != null && FREEPOS2 != null) {
+            cell.highlightMoves(FREEPOS1.id, FREEPOS2.id);
+          } else if (FREEPOS1 != null && FREEPOS2 == null) {
+            cell.highlightMoves(FREEPOS1.id);
+          } else if (FREEPOS2 != null && FREEPOS1 == null) {
+            cell.highlightMoves(FREEPOS2.id);
+          } else {
+            cell.highlightMoves(cell1.id);
           }
         } else {
           cell.highlightMoves(cell1.id);
         }
-        //
         break;
+      case cell1IsEmpty && !cell2IsEmpty:
+        if (cell1 != undefined) {
+          const FREEPOS1 = this.checkJump(field, n1, n2, cell1, 1);
+          const FREEPOS2 = this.checkJump(field, n1, n2, cell1, 2);
+
+          if (FREEPOS1 != null && FREEPOS2 != null) {
+            cell.highlightMoves(FREEPOS1.id, FREEPOS2.id, cell2.id);
+          } else if (FREEPOS1 != null && FREEPOS2 == null) {
+            cell.highlightMoves(FREEPOS1.id);
+          } else if (FREEPOS2 != null && FREEPOS1 == null) {
+            cell.highlightMoves(FREEPOS2.id);
+          } else {
+            cell.highlightMoves(cell2.id);
+          }
+        } else {
+          cell.highlightMoves(cell2.id);
+        }
+        break;
+
+      case !cell1IsEmpty && !cell2IsEmpty:
+        cell.highlightMoves(cell1.id, cell2.id);
+        break;
+      case cell1IsEmpty && cell2IsEmpty:
+        if (cell1 != undefined) {
+          const FREEPOS1 = this.checkJump(field, n1, n2, cell1, 1);
+          const FREEPOS2 = this.checkJump(field, n1, n2, cell1, 2);
+
+          if (FREEPOS1 != null && FREEPOS2 != null) {
+            cell.highlightMoves(FREEPOS1.id, FREEPOS2.id);
+          } else if (FREEPOS1 != null && FREEPOS2 == null) {
+            cell.highlightMoves(FREEPOS1.id);
+          } else if (FREEPOS2 != null && FREEPOS1 == null) {
+            cell.highlightMoves(FREEPOS2.id);
+          }
+        }
+        if (cell2 != undefined) {
+          const FREEPOS1 = this.checkJump(field, n1, n2, cell2, 1);
+          const FREEPOS2 = this.checkJump(field, n1, n2, cell2, 2);
+
+          if (FREEPOS1 != null && FREEPOS2 != null) {
+            cell.highlightMoves(FREEPOS1.id, FREEPOS2.id);
+          } else if (FREEPOS1 != null && FREEPOS2 == null) {
+            cell.highlightMoves(FREEPOS1.id);
+          } else if (FREEPOS2 != null && FREEPOS1 == null) {
+            cell.highlightMoves(FREEPOS2.id);
+          }
+        }
     }
   }
 
@@ -232,26 +296,25 @@ class Bot extends Player {
     const check = this.check[random];
 
     field.forEach((innerArray) => {
-      innerArray.forEach((el) => {
-        if (el.id == check.id) {
-          const cell = new Cell(`black`, check.id);
-          field[field.indexOf(innerArray)][innerArray.indexOf(check)] =
-            cell.generateCell();
-        }
-      });
+      // innerArray.forEach((el) => {
+      //   if (el.id == check.id) {
+      //     const cell = new Cell(`black`, check.id);
+      //     // field[field.indexOf(innerArray)][innerArray.indexOf(check)] =
+      //     //   cell.generateCell();
+      //   }
+      // });
       innerArray.forEach((pos) => {
-        const human = new Bot();
         if (
           pos.localName != `div` &&
           pos.style.backgroundColor == `rgb(23, 126, 211)`
         ) {
           check.id = pos.id;
-          const string = check.id;
+          const string = pos.id;
           let g = string.split(`-`);
 
           field[field.indexOf(innerArray)][innerArray.indexOf(pos)] =
-            human.generateCheck(g[2], g[1]);
-          pos.append(human.generateCheck(g[2], g[1]));
+            this.generateCheck(g[2], g[1]);
+          pos.append(this.generateCheck(g[2], g[1]));
         }
       });
     });
