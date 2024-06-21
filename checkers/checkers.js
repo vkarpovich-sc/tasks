@@ -137,29 +137,85 @@ class Human extends Player {
           if (lastFreeCell.localName != `th`) {
             return null;
           }
-          checking(field, n1, n2);
+          if (
+            field[n1 - i][n2 - i].style.backgroundColor != `white` ||
+            field[n1 - i][n2 + i].style.backgroundColor != `white`
+          ) {
+            checking(field, n1, n2);
+          }
         }
       } else {
         if (expression == 1) {
           const FREEPOS = field[n1 - i][n2 - i];
-          if (FREEPOS.localName != `div`) {
+          const lastPos = field[n1 - i - 1][n2 + i - 1];
+          if (
+            FREEPOS.localName != `div` &&
+            lastPos.style.backgroundColor != `white`
+          ) {
+            console.log(
+              `FREEPOS - ${FREEPOS.id} && FREEPOS.localName = ${FREEPOS.localName}`
+            );
             lastFreeCell = FREEPOS;
           }
         } else {
           const FREEPOS = field[n1 - i][n2 + i];
-          if (FREEPOS.localName != `div`) {
+          const lastPos = field[n1 - i - 1][n2 + i - 1];
+          if (
+            FREEPOS.localName != `div` &&
+            lastPos.style.backgroundColor != `white`
+          ) {
+            console.log(
+              `FREEPOS - ${FREEPOS.id} && FREEPOS.localName = ${FREEPOS.localName}`
+            );
             lastFreeCell = FREEPOS;
           }
         }
       }
     };
-    if (cell.style.backgroundColor === "black" && cell.localName == `div`) {
+    if (cell.style.backgroundColor === "black" && cell.localName === `div`) {
       console.log(`Cell - (id) - ${cell.id} - (localName) - ${cell.localName}`);
-
       checking(field, n1, n2);
+    } else {
+      return null;
     }
     i = 1;
-    return lastFreeCell;
+    // const lastPos = field[n1 - 1][n2  - 1];
+    // const lastPos2 = field[n1  - 1][n2  + 1];
+    if (expression == 1) {
+      const lastPos = field[n1 - 1][n2  - 1];
+      if (
+        lastFreeCell &&
+        lastFreeCell.localName != `div` &&
+        (lastPos) &&
+        (lastPos.style.backgroundColor != `white`)
+      ) {
+        console.log(`lastPos && lastPos2`, lastPos.id);
+        console.log(
+          `returning last free cell - ${lastFreeCell.id} && localName - ${lastFreeCell.localName}`
+        );
+        return lastFreeCell;
+      } else {
+        return null;
+      }
+    } 
+    else {
+      const lastPos = field[n1 - 1][n2  + 1];
+      if (
+        lastFreeCell &&
+        lastFreeCell.localName != `div` &&
+        (lastPos) &&
+        (lastPos.style.backgroundColor != `white`)
+      ) {
+        console.log(`lastPos && lastPos2`, lastPos.id);
+        console.log(
+          `returning last free cell - ${lastFreeCell.id} && localName - ${lastFreeCell.localName}`
+        );
+        return lastFreeCell;
+      } else {
+        return null;
+      }
+    }
+   
   }
   checkNearest(field, n1, n2) {
     const cell = new Cell();
@@ -172,7 +228,7 @@ class Human extends Player {
     );
     switch (true) {
       case cell2IsEmpty && !cell1IsEmpty:
-        if (cell2 != undefined) {
+        if (cell2 != undefined || cell2 != null) {
           const FREEPOS2 = this.checkJump(field, n1, n2, cell2, 2);
           const FREEPOS1 = this.checkJump(field, n1, n2, cell2, 1);
 
@@ -190,7 +246,7 @@ class Human extends Player {
         }
         break;
       case cell1IsEmpty && !cell2IsEmpty:
-        if (cell1 != undefined) {
+        if (cell1 != undefined || cell1 != null) {
           const FREEPOS1 = this.checkJump(field, n1, n2, cell1, 1);
           const FREEPOS2 = this.checkJump(field, n1, n2, cell1, 2);
 
@@ -212,7 +268,7 @@ class Human extends Player {
         cell.highlightMoves(cell1.id, cell2.id);
         break;
       case cell1IsEmpty && cell2IsEmpty:
-        if (cell1 != undefined) {
+        if (cell1 != undefined || cell1 != null) {
           const FREEPOS1 = this.checkJump(field, n1, n2, cell1, 1);
           const FREEPOS2 = this.checkJump(field, n1, n2, cell1, 2);
 
@@ -224,7 +280,7 @@ class Human extends Player {
             cell.highlightMoves(FREEPOS2.id);
           }
         }
-        if (cell2 != undefined) {
+        if (cell2 != undefined || cell2 != null) {
           const FREEPOS1 = this.checkJump(field, n1, n2, cell2, 1);
           const FREEPOS2 = this.checkJump(field, n1, n2, cell2, 2);
 
@@ -264,7 +320,7 @@ class Human extends Player {
         }
 
         if (el == element) {
-          const cell = new Cell(`white`, el.id);
+          const cell = new Cell(`black`, el.id);
           field[field.indexOf(innerArray)][innerArray.indexOf(el)] =
             cell.generateCell();
           console.log(`el.id = ${el.id}`);
