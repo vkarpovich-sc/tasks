@@ -98,200 +98,156 @@ class Human extends Player {
     let i = 1;
     let lastFreeCell = null;
 
-    const checking = (field, n1, n2) => {
+    const checking = () => {
       let isCellEmpty = null;
+
       if (expression == 1) {
         isCellEmpty =
           field[n1 - i][n2 - i] == undefined ||
-          field[n1 - i][n2 - i].localName === "div";
-      } else {
-        isCellEmpty =
-          field[n1 - i][n2 + i] == undefined ||
-          field[n1 - i][n2 + i].localName === "div";
-      }
+          field[n1 - i][n2 - i]?.localName === "div" ||
+          field[n1 - i][n2 - i] === null;
 
-      if (isCellEmpty && cell.style.backgroundColor != `white`) {
-        if (n1 - i < 0 || n2 - i < 0 || n2 + i >= field.length) {
-          return null;
-        }
-        i++;
-        if (expression == 1) {
-          lastFreeCell = field[n1 - i][n2 - i];
-          cell = lastFreeCell;
-        } else {
-          lastFreeCell = field[n1 - i][n2 + i];
-          cell = lastFreeCell;
-        }
-
-        if (
-          isCellEmpty &&
-          (lastFreeCell === undefined ||
-            lastFreeCell === null ||
-            lastFreeCell.localName != `th`)
-        ) {
-          return null;
-        } else {
-          console.log(
-            `lastFreeCell - (id) - ${lastFreeCell.id} - (localName) - ${lastFreeCell.localName}`
-          );
-          if (lastFreeCell.localName != `th`) {
+        if (isCellEmpty && cell.style.backgroundColor != "white") {
+          if (n1 - i < 0 || n2 - i < 0) {
             return null;
           }
+          i++;
+          lastFreeCell = field[n1 - i][n2 - i];
+
           if (
-            field[n1 - i][n2 - i].style.backgroundColor != `white` ||
-            field[n1 - i][n2 + i].style.backgroundColor != `white`
+            isCellEmpty &&
+            (lastFreeCell === undefined ||
+              lastFreeCell === null ||
+              lastFreeCell.localName != "th")
           ) {
-            checking(field, n1, n2);
+            return null;
+          } else if (field[n1 - i][n2 - i].style.backgroundColor != "white") {
+            checking();
           }
-        }
-      } else {
-        if (expression == 1) {
+        } else {
           const FREEPOS = field[n1 - i][n2 - i];
           const lastPos = field[n1 - i - 1][n2 + i - 1];
+
           if (
-            FREEPOS.localName != `div` &&
-            lastPos.style.backgroundColor != `white`
+            FREEPOS.localName != "div" &&
+            lastPos.style.backgroundColor != "white"
           ) {
-            console.log(
-              `FREEPOS - ${FREEPOS.id} && FREEPOS.localName = ${FREEPOS.localName}`
-            );
             lastFreeCell = FREEPOS;
+          }
+        }
+      }
+
+      if (expression == 2) {
+        isCellEmpty =
+          field[n1 - i][n2 + i] == undefined ||
+          field[n1 - i][n2 + i]?.localName === "div" ||
+          field[n1 - i][n2 + i] === null;
+
+        if (isCellEmpty && cell.style.backgroundColor != "white") {
+          if (n2 + i >= field.length || n1 - i < 0) {
+            return null;
+          }
+          i++;
+          lastFreeCell = field[n1 - i][n2 + i];
+
+          if (
+            isCellEmpty &&
+            (lastFreeCell === undefined ||
+              lastFreeCell === null ||
+              lastFreeCell.localName != "th")
+          ) {
+            return null;
+          } else if (field[n1 - i][n2 + i].style.backgroundColor != "white") {
+            checking();
           }
         } else {
           const FREEPOS = field[n1 - i][n2 + i];
           const lastPos = field[n1 - i - 1][n2 + i - 1];
+
           if (
-            FREEPOS.localName != `div` &&
-            lastPos.style.backgroundColor != `white`
+            FREEPOS.localName != "div" &&
+            lastPos.style.backgroundColor != "white"
           ) {
-            console.log(
-              `FREEPOS - ${FREEPOS.id} && FREEPOS.localName = ${FREEPOS.localName}`
-            );
-            lastFreeCell = FREEPOS;
           }
         }
       }
     };
     if (cell.style.backgroundColor === "black" && cell.localName === `div`) {
-      console.log(`Cell - (id) - ${cell.id} - (localName) - ${cell.localName}`);
-      checking(field, n1, n2);
+      checking();
     } else {
       return null;
     }
     i = 1;
-    // const lastPos = field[n1 - 1][n2  - 1];
-    // const lastPos2 = field[n1  - 1][n2  + 1];
-    if (expression == 1) {
-      const lastPos = field[n1 - 1][n2  - 1];
-      if (
-        lastFreeCell &&
-        lastFreeCell.localName != `div` &&
-        (lastPos) &&
-        (lastPos.style.backgroundColor != `white`)
-      ) {
-        console.log(`lastPos && lastPos2`, lastPos.id);
-        console.log(
-          `returning last free cell - ${lastFreeCell.id} && localName - ${lastFreeCell.localName}`
-        );
-        return lastFreeCell;
-      } else {
-        return null;
-      }
-    } 
-    else {
-      const lastPos = field[n1 - 1][n2  + 1];
-      if (
-        lastFreeCell &&
-        lastFreeCell.localName != `div` &&
-        (lastPos) &&
-        (lastPos.style.backgroundColor != `white`)
-      ) {
-        console.log(`lastPos && lastPos2`, lastPos.id);
-        console.log(
-          `returning last free cell - ${lastFreeCell.id} && localName - ${lastFreeCell.localName}`
-        );
-        return lastFreeCell;
-      } else {
-        return null;
-      }
+    let lastPos = null;
+    expression == 1
+      ? (lastPos = field[n1 - 1][n2 - 1])
+      : (lastPos = field[n1 - 1][n2 + 1]);
+    if (
+      lastFreeCell &&
+      lastFreeCell.localName != `div` &&
+      lastPos &&
+      lastPos.style.backgroundColor != `white`
+    ) {
+      console.log(`lastFreecell - ${lastFreeCell.id}`);
+      return lastFreeCell;
+    } else {
+      return null;
     }
-   
   }
+
   checkNearest(field, n1, n2) {
     const cell = new Cell();
     const cell1 = field[n1 - 1][n2 + 1];
     const cell2 = field[n1 - 1][n2 - 1];
     const cell1IsEmpty = cell1 == undefined || cell1.localName === "div";
     const cell2IsEmpty = cell2 == undefined || cell2.localName === "div";
-    console.log(
-      `cell1IsEmpty - ${cell1IsEmpty} &&  !cell1IsEmpty - ${!cell1IsEmpty},cell2IsEmpty - ${cell2IsEmpty}  &&  !cell2IsEmpty - ${!cell2IsEmpty}`
-    );
+    const checkCondition = (
+      cell,
+      cellToCheck,
+      highlight,
+      cellToHighlight = cellToCheck
+    ) => {
+      const FREEPOS2 = this.checkJump(field, n1, n2, cellToCheck, 2);
+      const FREEPOS1 = this.checkJump(field, n1, n2, cellToCheck, 1);
+
+      if (FREEPOS1 != null && FREEPOS2 != null) {
+        cell.highlightMoves(FREEPOS1.id, FREEPOS2.id);
+      } else if (FREEPOS1 != null && FREEPOS2 == null) {
+        cell.highlightMoves(FREEPOS1.id);
+      } else if (FREEPOS2 != null && FREEPOS1 == null) {
+        cell.highlightMoves(FREEPOS2.id);
+      } else {
+        if (highlight && cellToHighlight) {
+          cell.highlightMoves(cellToHighlight?.id);
+        }
+      }
+    };
     switch (true) {
       case cell2IsEmpty && !cell1IsEmpty:
         if (cell2 != undefined || cell2 != null) {
-          const FREEPOS2 = this.checkJump(field, n1, n2, cell2, 2);
-          const FREEPOS1 = this.checkJump(field, n1, n2, cell2, 1);
-
-          if (FREEPOS1 != null && FREEPOS2 != null) {
-            cell.highlightMoves(FREEPOS1.id, FREEPOS2.id);
-          } else if (FREEPOS1 != null && FREEPOS2 == null) {
-            cell.highlightMoves(FREEPOS1.id);
-          } else if (FREEPOS2 != null && FREEPOS1 == null) {
-            cell.highlightMoves(FREEPOS2.id);
-          } else {
-            cell.highlightMoves(cell1.id);
-          }
+          checkCondition(cell, cell2, true, cell1);
         } else {
           cell.highlightMoves(cell1.id);
         }
         break;
       case cell1IsEmpty && !cell2IsEmpty:
         if (cell1 != undefined || cell1 != null) {
-          const FREEPOS1 = this.checkJump(field, n1, n2, cell1, 1);
-          const FREEPOS2 = this.checkJump(field, n1, n2, cell1, 2);
-
-          if (FREEPOS1 != null && FREEPOS2 != null) {
-            cell.highlightMoves(FREEPOS1.id, FREEPOS2.id, cell2.id);
-          } else if (FREEPOS1 != null && FREEPOS2 == null) {
-            cell.highlightMoves(FREEPOS1.id);
-          } else if (FREEPOS2 != null && FREEPOS1 == null) {
-            cell.highlightMoves(FREEPOS2.id);
-          } else {
-            cell.highlightMoves(cell2.id);
-          }
+          checkCondition(cell, cell1, true, cell2);
         } else {
           cell.highlightMoves(cell2.id);
         }
         break;
-
+      case cell1IsEmpty && cell2IsEmpty:
+        if (cell1 != undefined || cell1 != null) {
+          checkCondition(cell, cell1, false);
+        }
+        if (cell2 != undefined || cell2 != null) {
+          checkCondition(cell, cell2, false);
+        }
+        break;
       case !cell1IsEmpty && !cell2IsEmpty:
         cell.highlightMoves(cell1.id, cell2.id);
         break;
-      case cell1IsEmpty && cell2IsEmpty:
-        if (cell1 != undefined || cell1 != null) {
-          const FREEPOS1 = this.checkJump(field, n1, n2, cell1, 1);
-          const FREEPOS2 = this.checkJump(field, n1, n2, cell1, 2);
-
-          if (FREEPOS1 != null && FREEPOS2 != null) {
-            cell.highlightMoves(FREEPOS1.id, FREEPOS2.id);
-          } else if (FREEPOS1 != null && FREEPOS2 == null) {
-            cell.highlightMoves(FREEPOS1.id);
-          } else if (FREEPOS2 != null && FREEPOS1 == null) {
-            cell.highlightMoves(FREEPOS2.id);
-          }
-        }
-        if (cell2 != undefined || cell2 != null) {
-          const FREEPOS1 = this.checkJump(field, n1, n2, cell2, 1);
-          const FREEPOS2 = this.checkJump(field, n1, n2, cell2, 2);
-
-          if (FREEPOS1 != null && FREEPOS2 != null) {
-            cell.highlightMoves(FREEPOS1.id, FREEPOS2.id);
-          } else if (FREEPOS1 != null && FREEPOS2 == null) {
-            cell.highlightMoves(FREEPOS1.id);
-          } else if (FREEPOS2 != null && FREEPOS1 == null) {
-            cell.highlightMoves(FREEPOS2.id);
-          }
-        }
     }
   }
 
@@ -323,7 +279,6 @@ class Human extends Player {
           const cell = new Cell(`black`, el.id);
           field[field.indexOf(innerArray)][innerArray.indexOf(el)] =
             cell.generateCell();
-          console.log(`el.id = ${el.id}`);
 
           element.id = event.target.id;
           event.target.append(element);
@@ -352,13 +307,6 @@ class Bot extends Player {
     const check = this.check[random];
 
     field.forEach((innerArray) => {
-      // innerArray.forEach((el) => {
-      //   if (el.id == check.id) {
-      //     const cell = new Cell(`black`, check.id);
-      //     // field[field.indexOf(innerArray)][innerArray.indexOf(check)] =
-      //     //   cell.generateCell();
-      //   }
-      // });
       innerArray.forEach((pos) => {
         if (
           pos.localName != `div` &&
