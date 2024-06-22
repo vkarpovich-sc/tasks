@@ -1,11 +1,20 @@
 class Checker {
+  static counter = 0;
   constructor(posLetter, posNumber, color) {
     this.posLetter = posLetter;
     this.posNumber = posNumber;
     this.color = color;
     this.pos = `pos-${this.posNumber}-${this.posLetter}`;
   }
+  // static addCheck() {
+  //   Checker.counter++;
+  //   console.log(Checker.counter);
+  // }
 
+  // static removeCheck() {
+  //   Checker.counter--;
+  //   console.log(Checker.counter);
+  // }
   geretateCheck() {}
 }
 
@@ -57,7 +66,6 @@ class Field {
           cellColor,
           `pos-${i + 1}-${letters[j]}`
         ).generateCell();
-        // const cellElement = cell.generateCell();
         if (i == 3 || i == 4) {
           this.field[i][j] = cell;
           tr.appendChild(cell);
@@ -209,7 +217,7 @@ class Human extends Player {
     ) => {
       const FREEPOS2 = this.checkJump(field, n1, n2, cellToCheck, 2);
       const FREEPOS1 = this.checkJump(field, n1, n2, cellToCheck, 1);
-
+      if (FREEPOS1 || FREEPOS2) Game.removeBlackCheck()
       if (FREEPOS1 != null && FREEPOS2 != null) {
         cell.highlightMoves(FREEPOS1.id, FREEPOS2.id);
       } else if (FREEPOS1 != null && FREEPOS2 == null) {
@@ -290,6 +298,7 @@ class Human extends Player {
   }
   generateCheck(posL, posN) {
     const check = new Simple(posL, posN, `white`).generateCheck();
+
     this.check.push(check);
     return check;
   }
@@ -371,7 +380,11 @@ class Rules {
 }
 
 class Game {
+  static whiteChecks = 12;
+  static blackChecks = 12;
   constructor() {}
+
+  
   generateHistoryField(move) {
     const div = document.getElementById(`container`);
     div.style.cssText = `display: grid;
@@ -381,6 +394,12 @@ class Game {
     const p = document.createElement(`p`);
     p.innerHTML = move;
     innerDiv.append(p);
+  }
+  static removeBlackCheck() {
+    Game.blackChecks--
+    const game = new Game
+    game.generateHistoryField(`вы сбили шашку врага`)
+    game.generateHistoryField(`шашек врага осталось ${Game.blackChecks}`)
   }
   startGame() {
     const field = new Field();
