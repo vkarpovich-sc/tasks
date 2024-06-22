@@ -6,15 +6,7 @@ class Checker {
     this.color = color;
     this.pos = `pos-${this.posNumber}-${this.posLetter}`;
   }
-  // static addCheck() {
-  //   Checker.counter++;
-  //   console.log(Checker.counter);
-  // }
 
-  // static removeCheck() {
-  //   Checker.counter--;
-  //   console.log(Checker.counter);
-  // }
   geretateCheck() {}
 }
 
@@ -217,7 +209,7 @@ class Human extends Player {
     ) => {
       const FREEPOS2 = this.checkJump(field, n1, n2, cellToCheck, 2);
       const FREEPOS1 = this.checkJump(field, n1, n2, cellToCheck, 1);
-      if (FREEPOS1 || FREEPOS2) Game.removeBlackCheck()
+      if (FREEPOS1 || FREEPOS2) Game.removeBlackCheck();
       if (FREEPOS1 != null && FREEPOS2 != null) {
         cell.highlightMoves(FREEPOS1.id, FREEPOS2.id);
       } else if (FREEPOS1 != null && FREEPOS2 == null) {
@@ -384,7 +376,6 @@ class Game {
   static blackChecks = 12;
   constructor() {}
 
-  
   generateHistoryField(move) {
     const div = document.getElementById(`container`);
     div.style.cssText = `display: grid;
@@ -395,11 +386,18 @@ class Game {
     p.innerHTML = move;
     innerDiv.append(p);
   }
-  static removeBlackCheck() {
-    Game.blackChecks--
-    const game = new Game
-    game.generateHistoryField(`вы сбили шашку врага`)
-    game.generateHistoryField(`шашек врага осталось ${Game.blackChecks}`)
+  static removeBlackCheck(id) {
+    Game.blackChecks--;
+    const game = new Game();
+    game.generateHistoryField(`вы сбили шашку врага`);
+    game.generateHistoryField(`шашек врага осталось ${Game.blackChecks}`);
+  }
+
+  static removeWhiteCheck() {
+    Game.whiteChecks--;
+    const game = new Game();
+    game.generateHistoryField(`вы сбили шашку врага`);
+    game.generateHistoryField(`шашек врага осталось ${Game.whiteChecks}`);
   }
   startGame() {
     const field = new Field();
