@@ -92,8 +92,6 @@ class Human extends Player {
     this.clickedFigure = null;
   }
 
-  handleJump() {}
-
   checkJump(field, n1, n2, cell, expression) {
     let i = 1;
     let lastFreeCell = null;
@@ -126,11 +124,12 @@ class Human extends Player {
           }
         } else {
           const FREEPOS = field[n1 - i][n2 - i];
-          const lastPos = field[n1 - i - 1][n2 + i - 1];
+          const lastPos = field[n1 - i - 1][n2 - i + 1];
 
           if (
             FREEPOS.localName != "div" &&
-            lastPos.style.backgroundColor != "white"
+            lastPos.style.backgroundColor != "white" &&
+            i >= 2
           ) {
             lastFreeCell = FREEPOS;
           }
@@ -166,7 +165,8 @@ class Human extends Player {
 
           if (
             FREEPOS.localName != "div" &&
-            lastPos.style.backgroundColor != "white"
+            lastPos.style.backgroundColor != "white" &&
+            i >= 2
           ) {
           }
         }
@@ -209,7 +209,6 @@ class Human extends Player {
     ) => {
       const FREEPOS2 = this.checkJump(field, n1, n2, cellToCheck, 2);
       const FREEPOS1 = this.checkJump(field, n1, n2, cellToCheck, 1);
-      if (FREEPOS1 || FREEPOS2) Game.removeBlackCheck();
       if (FREEPOS1 != null && FREEPOS2 != null) {
         cell.highlightMoves(FREEPOS1.id, FREEPOS2.id);
       } else if (FREEPOS1 != null && FREEPOS2 == null) {
@@ -374,7 +373,10 @@ class Rules {
 class Game {
   static whiteChecks = 12;
   static blackChecks = 12;
-  constructor() {}
+  constructor() {
+    this.cellToClick1 = null;
+    this.cellToClick2 = null;
+  }
 
   generateHistoryField(move) {
     const div = document.getElementById(`container`);
@@ -386,11 +388,35 @@ class Game {
     p.innerHTML = move;
     innerDiv.append(p);
   }
-  static removeBlackCheck(id) {
+  static removeBlackCheck(id, field) {
+    const letters = [`A`, `B`, `C`, `D`, `E`, `F`, `G`, `H`];
+    let nums = id.split(`-`);
+    console.log(`id - ${id}`);
     Game.blackChecks--;
     const game = new Game();
-    game.generateHistoryField(`вы сбили шашку врага`);
-    game.generateHistoryField(`шашек врага осталось ${Game.blackChecks}`);
+    //  game.generateHistoryField(nums[0]);
+    //  game.generateHistoryField(nums[1]);
+    //  game.generateHistoryField(nums[2]);
+    //  let k = nums.join(`-`);
+    //  game.generateHistoryField(k);
+    //  game.generateHistoryField(`index of nums[2] = ${letters.indexOf(nums[2])}`)
+    console.log(`nums[1] - ${parseInt(nums[1])}`);
+    const newPos1 = field[parseInt(nums[1])][letters.indexOf(nums[2]) + 1];
+    const newPos2 = field[parseInt(nums[1])][letters.indexOf(nums[2]) - 1];
+    console.log(`newPos - 1 - ${newPos1.id}, newPos2 - ${newPos2.id}`);
+    if (
+      newPos1.localName == `div` &&
+      newPos1.style.backgroundColor == `black`
+    ) {
+      game.generateHistoryField(`вы сбили шашку врага`);
+      game.generateHistoryField(`шашек врага осталось ${Game.blackChecks}`);
+      const cell = new Cell(`black`, newPos1.id);
+      field[parseInt(nums[1])][letters.indexOf(nums[2]) + 1] =
+        cell.generateCell();
+
+      document.getElementById(newPos1.id).replaceWith(` empty`);
+    }
+    return field;
   }
 
   static removeWhiteCheck() {
@@ -399,6 +425,7 @@ class Game {
     game.generateHistoryField(`вы сбили шашку врага`);
     game.generateHistoryField(`шашек врага осталось ${Game.whiteChecks}`);
   }
+
   startGame() {
     const field = new Field();
     const human = new Human();
@@ -421,7 +448,7 @@ class Game {
         a = a.find((el) => el.id == human.clickedFigure);
 
         field.field = human.handleMove(a, field.field, event);
-
+        Game.removeBlackCheck(event.target.id, field.field);
         console.log(field.field);
       }
       field.field = bot.handleMove(field.field);
